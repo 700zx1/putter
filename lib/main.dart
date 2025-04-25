@@ -12,7 +12,7 @@ class PloofApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ploof Torrent Search',
+      title: 'putter torrent search',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
