@@ -34,6 +34,7 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
   List<TorrentResult> _results = [];
   int _currentPage = 1;
   String _lastQuery = '';
+  String? _errorMessage;
   final List<TorrentSource> _sources = [X1337Source()];
   late TorrentSource _selectedSource = _sources[0];
 
@@ -42,18 +43,33 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
       _loading = true;
       _currentPage = 1;
       _results = [];
+      _errorMessage = null;
     });
     final query = _searchController.text.trim();
     if (query.isEmpty) {
-      setState(() => _loading = false);
+      setState(() {
+        _loading = false;
+        _errorMessage = 'Search query cannot be empty.';
+      });
       return;
     }
     _lastQuery = query;
-    final results = await _selectedSource.searchTorrents(query, page: 1);
-    setState(() {
-      _results = results;
-      _loading = false;
-    });
+    try {
+      print('Searching for: "$query"');
+      final results = await _selectedSource.searchTorrents(query, page: 1);
+      print('Results count: \\${results.length}');
+      setState(() {
+        _results = results;
+        _loading = false;
+        _errorMessage = results.isEmpty ? 'No results found.' : null;
+      });
+    } catch (e, st) {
+      print('Search error: $e\\n$st');
+      setState(() {
+        _loading = false;
+        _errorMessage = 'Search failed: $e';
+      });
+    }
   }
 
   void _loadMore() async {
@@ -113,66 +129,76 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
   ],
 ),
             const SizedBox(height: 24),
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+              ),
             Expanded(
-  child: _results.isEmpty
-      ? const Center(child: Text('No results'))
-      : SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const [
-                DataColumn(label: Text('Title')),
-                DataColumn(label: Text('Seeders')),
-                DataColumn(label: Text('Leechers')),
-                DataColumn(label: Text('Magnet Link')),
-                DataColumn(label: Text('URL')),
-              ],
-              rows: _results
-                  .map(
-                    (r) => DataRow(cells: [
-                      DataCell(Text(r.title)),
-                      DataCell(Text(r.seeders.toString())),
-                      DataCell(Text(r.leechers.toString())),
-                      DataCell(
-                        InkWell(
-                          child: Text(
-                            r.magnet,
-                            style: const TextStyle(
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline,
+              child: _results.isEmpty && _errorMessage == null
+                  ? const Center(child: Text('No results'))
+                  : _results.isEmpty
+                      ? const SizedBox.shrink()
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columns: const [
+                                DataColumn(label: Text('Title')),
+                                DataColumn(label: Text('Seeders')),
+                                DataColumn(label: Text('Leechers')),
+                                DataColumn(label: Text('Magnet Link')),
+                                DataColumn(label: Text('URL')),
+                              ],
+                              rows: _results
+                                  .map(
+                                    (r) => DataRow(cells: [
+                                      DataCell(Text(r.title)),
+                                      DataCell(Text(r.seeders.toString())),
+                                      DataCell(Text(r.leechers.toString())),
+                                      DataCell(
+                                        InkWell(
+                                          child: Text(
+                                            r.magnet,
+                                            style: const TextStyle(
+                                              color: Colors.blue,
+                                              decoration: TextDecoration.underline,
+                                            ),
+                                          ),
+                                          onTap: () async {
+                                            final url = r.magnet;
+                                            if (await canLaunchUrl(Uri.parse(url))) {
+                                              await launchUrl(Uri.parse(url));
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      DataCell(
+                                        InkWell(
+                                          child: Text(
+                                            r.url,
+                                            style: const TextStyle(
+                                                color: Colors.blue,
+                                                decoration: TextDecoration.underline),
+                                          ),
+                                          onTap: () async {
+                                            final url = r.url;
+                                            if (await canLaunchUrl(Uri.parse(url))) {
+                                              await launchUrl(Uri.parse(url));
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ]),
+                                  )
+                                  .toList(),
                             ),
                           ),
-                          onTap: () async {
-                            final url = r.magnet;
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(Uri.parse(url));
-                            }
-                          },
                         ),
-                      ),
-                      DataCell(
-                        InkWell(
-                          child: Text(
-                            r.url,
-                            style: const TextStyle(
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline),
-                          ),
-                          onTap: () async {
-                            final url = r.url;
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(Uri.parse(url));
-                            }
-                          },
-                        ),
-                      ),
-                    ]),
-                  )
-                  .toList(),
-            ),
-          ),
-        ),
             ),
             const SizedBox(height: 8),
             ElevatedButton(
