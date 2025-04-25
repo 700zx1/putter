@@ -171,8 +171,15 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
                                           ),
                                           onTap: () async {
                                             final url = r.magnet;
-                                            if (await canLaunchUrl(Uri.parse(url))) {
-                                              await launchUrl(Uri.parse(url));
+                                            final uri = Uri.parse(url);
+                                            print('[MAGNET] onTap for: $url');
+                                            final canLaunch = await canLaunchUrl(uri);
+                                            print('[MAGNET] canLaunchUrl: $canLaunch');
+                                            if (canLaunch) {
+                                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                              print('[MAGNET] launchUrl called');
+                                            } else {
+                                              print('[MAGNET] cannot launch this magnet link');
                                             }
                                           },
                                         ),
@@ -187,8 +194,15 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
                                           ),
                                           onTap: () async {
                                             final url = r.url;
-                                            if (await canLaunchUrl(Uri.parse(url))) {
-                                              await launchUrl(Uri.parse(url));
+                                            final uri = Uri.parse(url);
+                                            print('[LINK] onTap for: $url');
+                                            final canLaunch = await canLaunchUrl(uri);
+                                            print('[LINK] canLaunchUrl: $canLaunch');
+                                            if (canLaunch) {
+                                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                              print('[LINK] launchUrl called');
+                                            } else {
+                                              print('[LINK] cannot launch this link');
                                             }
                                           },
                                         ),
