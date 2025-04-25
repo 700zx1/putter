@@ -86,7 +86,7 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ploof Torrent Search')),
+      appBar: AppBar(title: const Text('putter torrent search')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
