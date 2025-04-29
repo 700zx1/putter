@@ -16,20 +16,7 @@ A cross-platform torrent search app, ported from Python to Dart with Flutter.
 
 ## Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/700zx1/putter.git
-   cd putter
-   ```
-2. **Install dependencies:**
-   ```bash
-   flutter pub get
-   ```
-3. **Run the app:**
-   ```bash
-   flutter run
-   ```
-   You can run on Android, iOS, Linux, macOS, Windows, or web (Flutter supported platforms).
+See the releases page for pre-built APKs.
 
 ## Usage
 
