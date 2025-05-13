@@ -59,7 +59,9 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
     _lastQuery = query;
     try {
       print('Searching for: "$query"');
-      final results = await _selectedSource.searchTorrents(query, page: 1);
+      final results = _selectedSource is RequiresContext
+    ? await (_selectedSource as dynamic).searchTorrents(query, page: 1, context: context)
+    : await _selectedSource.searchTorrents(query, page: 1);
       print('Results count: \\${results.length}');
       setState(() {
         _results = results;
@@ -78,7 +80,9 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
   void _loadMore() async {
     setState(() => _loading = true);
     final nextPage = _currentPage + 1;
-    final moreResults = await _selectedSource.searchTorrents(_lastQuery, page: nextPage);
+    final moreResults = _selectedSource is RequiresContext
+    ? await (_selectedSource as dynamic).searchTorrents(_lastQuery, page: nextPage, context: context)
+    : await _selectedSource.searchTorrents(_lastQuery, page: nextPage);
     setState(() {
       _currentPage = nextPage;
       _results.addAll(moreResults);
