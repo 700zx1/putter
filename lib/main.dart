@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'torrent_sources.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'torrent_result.dart';
+import 'sources/x1337_source.dart';
+import 'sources/nsw2u_source.dart';
 
 void main() {
   runApp(const PloofApp());
@@ -35,7 +38,7 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
   int _currentPage = 1;
   String _lastQuery = '';
   String? _errorMessage;
-  final List<TorrentSource> _sources = [X1337Source()];
+  final List<TorrentSource> _sources = [X1337Source(), Nsw2uSource()];
   late TorrentSource _selectedSource = _sources[0];
 
   void _performSearch() async {
@@ -230,20 +233,4 @@ class _TorrentSearchPageState extends State<TorrentSearchPage> {
       ),
     );
   }
-}
-
-class TorrentResult {
-  final String title;
-  final int seeders;
-  final int leechers;
-  final String magnet;
-  final String url;
-
-  TorrentResult({
-    required this.title,
-    required this.seeders,
-    required this.leechers,
-    required this.magnet,
-    required this.url,
-  });
 }
